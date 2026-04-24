@@ -1,13 +1,14 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf_combiner/pdf_combiner.dart';
+
 /// Merges multiple PDF files into a single document.
 class PdfCombineService {
   /// Merge [paths] into one PDF. Returns the output file path.
   Future<String> combinePdfs(List<String> paths) async {
     final dir = await getApplicationDocumentsDirectory();
     final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final outputPath = '${dir.path}/ToolForge_Merged_$timestamp.pdf';
+    final outputPath = '${dir.path}/Zenvix_Merged_$timestamp.pdf';
 
     await PdfCombiner.mergeMultiplePDFs(
       inputPaths: paths,

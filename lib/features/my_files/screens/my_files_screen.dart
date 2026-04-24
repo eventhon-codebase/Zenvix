@@ -132,7 +132,7 @@ class _MyFilesScreenState extends ConsumerState<MyFilesScreen> {
     try {
       await Share.shareXFiles([
         XFile(file.path),
-      ], text: 'Generated with ToolForge');
+      ], text: 'Generated with Zenvix');
     } catch (e) {
       if (mounted) showErrorSnackbar(context, message: 'Failed to share: $e');
     }
@@ -344,7 +344,7 @@ class _MyFilesScreenState extends ConsumerState<MyFilesScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${file.formattedSize}  ·  $timeStr',
+                            '${file.formattedSize}  Â·  $timeStr',
                             style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.textSecondary,

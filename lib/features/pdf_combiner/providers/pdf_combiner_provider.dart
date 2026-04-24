@@ -83,14 +83,21 @@ class PdfCombinerNotifier extends StateNotifier<PdfCombinerState> {
       return;
     }
 
-    state = state.copyWith(status: CombineStatus.processing, clearOutput: true, clearError: true);
+    state = state.copyWith(
+      status: CombineStatus.processing,
+      clearOutput: true,
+      clearError: true,
+    );
 
     try {
       final paths = state.files.map((f) => f.path).toList();
       final output = await _service.combinePdfs(paths);
       state = state.copyWith(status: CombineStatus.done, outputPath: output);
     } catch (e) {
-      state = state.copyWith(status: CombineStatus.error, errorMessage: 'Merge failed: $e');
+      state = state.copyWith(
+        status: CombineStatus.error,
+        errorMessage: 'Merge failed: $e',
+      );
     }
   }
 
@@ -108,6 +115,7 @@ class PdfCombinerNotifier extends StateNotifier<PdfCombinerState> {
   void clearError() => state = state.copyWith(clearError: true);
 }
 
-final pdfCombinerProvider = StateNotifierProvider<PdfCombinerNotifier, PdfCombinerState>(
-  (ref) => PdfCombinerNotifier(),
-);
+final pdfCombinerProvider =
+    StateNotifierProvider<PdfCombinerNotifier, PdfCombinerState>(
+      (ref) => PdfCombinerNotifier(),
+    );

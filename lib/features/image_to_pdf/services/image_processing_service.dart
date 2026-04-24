@@ -11,17 +11,21 @@ class ImageProcessingService {
   /// Apply all edits defined on [editableImage] and return processed bytes.
   Future<Uint8List> processImage(EditableImage editableImage) async {
     final originalBytes =
-        editableImage.processedBytes ?? await _readFile(editableImage.originalPath);
+        editableImage.processedBytes ??
+        await _readFile(editableImage.originalPath);
 
-    return compute(_processInIsolate, _ProcessParams(
-      bytes: originalBytes,
-      rotation: editableImage.rotation,
-      flipH: editableImage.flipHorizontal,
-      flipV: editableImage.flipVertical,
-      brightness: editableImage.brightness,
-      contrast: editableImage.contrast,
-      grayscale: editableImage.grayscale,
-    ));
+    return compute(
+      _processInIsolate,
+      _ProcessParams(
+        bytes: originalBytes,
+        rotation: editableImage.rotation,
+        flipH: editableImage.flipHorizontal,
+        flipV: editableImage.flipVertical,
+        brightness: editableImage.brightness,
+        contrast: editableImage.contrast,
+        grayscale: editableImage.grayscale,
+      ),
+    );
   }
 
   /// Read original file bytes.

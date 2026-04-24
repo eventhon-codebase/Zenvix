@@ -9,9 +9,7 @@ class ImagePickerService {
 
   /// Pick multiple images from the device gallery.
   Future<List<String>> pickFromGallery() async {
-    final images = await _imagePicker.pickMultiImage(
-      imageQuality: 90,
-    );
+    final images = await _imagePicker.pickMultiImage(imageQuality: 90);
     return images.map((img) => img.path).toList();
   }
 

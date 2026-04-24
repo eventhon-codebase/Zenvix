@@ -34,10 +34,20 @@ class _PdfOptionsSheetState extends ConsumerState<PdfOptionsSheet> {
           children: [
             // Drag handle
             Center(
-              child: Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.surfaceBorder, borderRadius: BorderRadius.circular(2))),
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceBorder,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
             ),
             const SizedBox(height: 20),
-            Text(AppStrings.pdfOptions, style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              AppStrings.pdfOptions,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 20),
 
             // Page size
@@ -47,7 +57,8 @@ class _PdfOptionsSheetState extends ConsumerState<PdfOptionsSheet> {
               values: PdfPageSize.values,
               selected: _options.pageSize,
               labelOf: (v) => v.label,
-              onChanged: (v) => setState(() => _options = _options.copyWith(pageSize: v)),
+              onChanged: (v) =>
+                  setState(() => _options = _options.copyWith(pageSize: v)),
             ),
             const SizedBox(height: 16),
 
@@ -58,15 +69,20 @@ class _PdfOptionsSheetState extends ConsumerState<PdfOptionsSheet> {
               values: PdfOrientation.values,
               selected: _options.orientation,
               labelOf: (v) => v.label,
-              onChanged: (v) => setState(() => _options = _options.copyWith(orientation: v)),
+              onChanged: (v) =>
+                  setState(() => _options = _options.copyWith(orientation: v)),
             ),
             const SizedBox(height: 16),
 
             // Margin
             _label('${AppStrings.margin}: ${_options.marginMm.round()} mm'),
             Slider(
-              value: _options.marginMm, min: 0, max: 30, divisions: 30,
-              onChanged: (v) => setState(() => _options = _options.copyWith(marginMm: v)),
+              value: _options.marginMm,
+              min: 0,
+              max: 30,
+              divisions: 30,
+              onChanged: (v) =>
+                  setState(() => _options = _options.copyWith(marginMm: v)),
             ),
 
             // Scaling
@@ -76,7 +92,8 @@ class _PdfOptionsSheetState extends ConsumerState<PdfOptionsSheet> {
               values: ImageScaling.values,
               selected: _options.scaling,
               labelOf: (v) => v.label,
-              onChanged: (v) => setState(() => _options = _options.copyWith(scaling: v)),
+              onChanged: (v) =>
+                  setState(() => _options = _options.copyWith(scaling: v)),
             ),
             const SizedBox(height: 24),
 
@@ -85,7 +102,9 @@ class _PdfOptionsSheetState extends ConsumerState<PdfOptionsSheet> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  ref.read(imageToPdfProvider.notifier).updatePdfOptions(_options);
+                  ref
+                      .read(imageToPdfProvider.notifier)
+                      .updatePdfOptions(_options);
                   Navigator.pop(context);
                 },
                 child: const Text('Apply Settings'),
@@ -97,7 +116,14 @@ class _PdfOptionsSheetState extends ConsumerState<PdfOptionsSheet> {
     );
   }
 
-  Widget _label(String text) => Text(text, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary));
+  Widget _label(String text) => Text(
+    text,
+    style: const TextStyle(
+      fontSize: 13,
+      fontWeight: FontWeight.w600,
+      color: AppColors.textSecondary,
+    ),
+  );
 }
 
 /// A generic segmented selector with neon accent.
@@ -107,7 +133,12 @@ class _SegmentedSelector<T> extends StatelessWidget {
   final String Function(T) labelOf;
   final ValueChanged<T> onChanged;
 
-  const _SegmentedSelector({required this.values, required this.selected, required this.labelOf, required this.onChanged});
+  const _SegmentedSelector({
+    required this.values,
+    required this.selected,
+    required this.labelOf,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -122,16 +153,25 @@ class _SegmentedSelector<T> extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 3),
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.neonBlue.withValues(alpha: 0.15) : AppColors.surfaceLight,
+                color: isSelected
+                    ? AppColors.neonBlue.withValues(alpha: 0.15)
+                    : AppColors.surfaceLight,
                 borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
-                border: Border.all(color: isSelected ? AppColors.neonBlue : AppColors.surfaceBorder),
+                border: Border.all(
+                  color: isSelected
+                      ? AppColors.neonBlue
+                      : AppColors.surfaceBorder,
+                ),
               ),
               child: Center(
                 child: Text(
                   labelOf(v),
                   style: TextStyle(
-                    fontSize: 13, fontWeight: FontWeight.w600,
-                    color: isSelected ? AppColors.neonBlue : AppColors.textSecondary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: isSelected
+                        ? AppColors.neonBlue
+                        : AppColors.textSecondary,
                   ),
                 ),
               ),

@@ -45,10 +45,7 @@ class AppRouter {
             begin: const Offset(1.0, 0.0),
             end: Offset.zero,
           ).animate(curvedAnimation),
-          child: FadeTransition(
-            opacity: curvedAnimation,
-            child: child,
-          ),
+          child: FadeTransition(opacity: curvedAnimation, child: child),
         );
       },
       transitionDuration: const Duration(milliseconds: 350),

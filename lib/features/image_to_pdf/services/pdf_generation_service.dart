@@ -15,7 +15,7 @@ class PdfGenerationService {
 
   /// Build and save the PDF.
   ///
-  /// [onProgress] reports a value 0.0–1.0 as each image is processed.
+  /// [onProgress] reports a value 0.0â€“1.0 as each image is processed.
   /// Returns the path to the saved PDF file.
   Future<String> generatePdf({
     required List<EditableImage> images,
@@ -34,7 +34,9 @@ class PdfGenerationService {
       if (editableImage.hasEdits) {
         imageBytes = await _processingService.processImage(editableImage);
       } else {
-        imageBytes = await _processingService.readFileBytes(editableImage.originalPath);
+        imageBytes = await _processingService.readFileBytes(
+          editableImage.originalPath,
+        );
       }
 
       final pdfImage = pw.MemoryImage(imageBytes);
@@ -55,10 +57,7 @@ class PdfGenerationService {
               );
             } else {
               return pw.Center(
-                child: pw.Image(
-                  pdfImage,
-                  fit: pw.BoxFit.contain,
-                ),
+                child: pw.Image(pdfImage, fit: pw.BoxFit.contain),
               );
             }
           },
@@ -72,7 +71,7 @@ class PdfGenerationService {
     // Save to documents directory.
     final dir = await getApplicationDocumentsDirectory();
     final timestamp = DateTime.now().millisecondsSinceEpoch;
-    final outputPath = '${dir.path}/ToolForge_$timestamp.pdf';
+    final outputPath = '${dir.path}/Zenvix_$timestamp.pdf';
     final file = File(outputPath);
     await file.writeAsBytes(await pdf.save());
 

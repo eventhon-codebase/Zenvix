@@ -63,8 +63,9 @@ class _NeonButtonState extends State<NeonButton>
             boxShadow: isEnabled
                 ? [
                     BoxShadow(
-                      color: AppColors.neonBlue
-                          .withValues(alpha: _glowAnimation.value * 0.25),
+                      color: AppColors.neonBlue.withValues(
+                        alpha: _glowAnimation.value * 0.25,
+                      ),
                       blurRadius: 16,
                       spreadRadius: 1,
                     ),
@@ -88,8 +89,9 @@ class _NeonButtonState extends State<NeonButton>
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Row(
-                mainAxisSize:
-                    widget.expanded ? MainAxisSize.max : MainAxisSize.min,
+                mainAxisSize: widget.expanded
+                    ? MainAxisSize.max
+                    : MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (widget.isLoading) ...[
@@ -106,9 +108,7 @@ class _NeonButtonState extends State<NeonButton>
                     Icon(
                       widget.icon,
                       size: 20,
-                      color: isEnabled
-                          ? Colors.black
-                          : AppColors.textDisabled,
+                      color: isEnabled ? Colors.black : AppColors.textDisabled,
                     ),
                     const SizedBox(width: 10),
                   ],

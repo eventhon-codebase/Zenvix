@@ -68,8 +68,9 @@ class EditableImage {
     return EditableImage(
       id: id ?? this.id,
       originalPath: originalPath ?? this.originalPath,
-      processedBytes:
-          clearProcessedBytes ? null : (processedBytes ?? this.processedBytes),
+      processedBytes: clearProcessedBytes
+          ? null
+          : (processedBytes ?? this.processedBytes),
       rotation: rotation ?? this.rotation,
       flipHorizontal: flipHorizontal ?? this.flipHorizontal,
       flipVertical: flipVertical ?? this.flipVertical,

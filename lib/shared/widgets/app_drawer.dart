@@ -81,10 +81,7 @@ class AppDrawer extends StatelessWidget {
               ),
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [
-                    Color(0xFF0A0A1A),
-                    Color(0xFF000000),
-                  ],
+                  colors: [Color(0xFF0A0A1A), Color(0xFF000000)],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -118,16 +115,16 @@ class AppDrawer extends StatelessWidget {
                   Text(
                     AppStrings.appName,
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1,
-                        ),
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1,
+                    ),
                   ),
                   const SizedBox(height: AppTheme.spacingXS),
                   Text(
                     'Multi-tool utility suite',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textTertiary,
-                        ),
+                      color: AppColors.textTertiary,
+                    ),
                   ),
                 ],
               ),
@@ -156,9 +153,9 @@ class AppDrawer extends StatelessWidget {
               padding: const EdgeInsets.all(AppTheme.spacingMD),
               child: Text(
                 'v${AppStrings.appVersion}',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textDisabled,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: AppColors.textDisabled),
               ),
             ),
           ],
@@ -181,8 +178,8 @@ class AppDrawer extends StatelessWidget {
             color: item.isCurrent
                 ? AppColors.neonBlue
                 : item.enabled
-                    ? AppColors.textSecondary
-                    : AppColors.textDisabled,
+                ? AppColors.textSecondary
+                : AppColors.textDisabled,
             size: 22,
           ),
           title: Text(
@@ -193,14 +190,16 @@ class AppDrawer extends StatelessWidget {
               color: item.isCurrent
                   ? AppColors.neonBlue
                   : item.enabled
-                      ? AppColors.textPrimary
-                      : AppColors.textDisabled,
+                  ? AppColors.textPrimary
+                  : AppColors.textDisabled,
             ),
           ),
           trailing: !item.enabled
               ? Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.surfaceLight,
                     borderRadius: BorderRadius.circular(AppTheme.radiusSmall),
@@ -245,7 +244,10 @@ class AppDrawer extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close', style: TextStyle(color: AppColors.neonBlue)),
+            child: const Text(
+              'Close',
+              style: TextStyle(color: AppColors.neonBlue),
+            ),
           ),
         ],
       ),

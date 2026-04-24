@@ -21,7 +21,10 @@ class PdfCombineResultScreen extends ConsumerWidget {
       builder: (context) {
         return AlertDialog(
           backgroundColor: AppColors.surface,
-          title: const Text('Save PDF', style: TextStyle(color: AppColors.textPrimary)),
+          title: const Text(
+            'Save PDF',
+            style: TextStyle(color: AppColors.textPrimary),
+          ),
           content: TextField(
             controller: controller,
             style: const TextStyle(color: AppColors.textPrimary),
@@ -29,24 +32,35 @@ class PdfCombineResultScreen extends ConsumerWidget {
               labelText: 'File Name',
               suffixText: '.pdf',
               labelStyle: const TextStyle(color: AppColors.textSecondary),
-              enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: AppColors.surfaceBorder)),
-              focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: AppColors.electricPurple)),
+              enabledBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: AppColors.surfaceBorder),
+              ),
+              focusedBorder: const UnderlineInputBorder(
+                borderSide: BorderSide(color: AppColors.electricPurple),
+              ),
             ),
             autofocus: true,
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: AppColors.textSecondary),
+              ),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.electricPurple),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.electricPurple,
+              ),
               onPressed: () async {
                 final name = controller.text.trim();
                 if (name.isEmpty) return;
                 Navigator.pop(context); // close dialog
-                
-                final savedPath = await ref.read(pdfCombinerProvider.notifier).saveMergedPdf(name);
+
+                final savedPath = await ref
+                    .read(pdfCombinerProvider.notifier)
+                    .saveMergedPdf(name);
                 if (context.mounted && savedPath != null) {
                   showSuccessSnackbar(context, message: 'Saved to: $savedPath');
                 }
@@ -91,19 +105,38 @@ class PdfCombineResultScreen extends ConsumerWidget {
               children: [
                 // Success icon
                 Container(
-                  width: 100, height: 100,
+                  width: 100,
+                  height: 100,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppColors.success.withValues(alpha: 0.1),
-                    boxShadow: [BoxShadow(color: AppColors.success.withValues(alpha: 0.2), blurRadius: 30, spreadRadius: 8)],
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.success.withValues(alpha: 0.2),
+                        blurRadius: 30,
+                        spreadRadius: 8,
+                      ),
+                    ],
                   ),
-                  child: const Icon(Icons.check_rounded, size: 56, color: AppColors.success),
+                  child: const Icon(
+                    Icons.check_rounded,
+                    size: 56,
+                    color: AppColors.success,
+                  ),
                 ),
                 const SizedBox(height: AppTheme.spacingLG),
-                Text(AppStrings.mergeSuccess, style: Theme.of(context).textTheme.headlineSmall, textAlign: TextAlign.center),
+                Text(
+                  AppStrings.mergeSuccess,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                  textAlign: TextAlign.center,
+                ),
                 const SizedBox(height: AppTheme.spacingSM),
                 if (state.outputPath != null)
-                  Text(state.outputPath!.split('/').last, style: Theme.of(context).textTheme.bodySmall, textAlign: TextAlign.center),
+                  Text(
+                    state.outputPath!.split('/').last,
+                    style: Theme.of(context).textTheme.bodySmall,
+                    textAlign: TextAlign.center,
+                  ),
                 const SizedBox(height: AppTheme.spacingXL),
 
                 NeonButton(
@@ -112,9 +145,16 @@ class PdfCombineResultScreen extends ConsumerWidget {
                   onPressed: () async {
                     if (state.outputPath != null) {
                       try {
-                        await Share.shareXFiles([XFile(state.outputPath!)], text: 'Merged with ToolForge');
+                        await Share.shareXFiles([
+                          XFile(state.outputPath!),
+                        ], text: 'Merged with Zenvix');
                       } catch (e) {
-                        if (context.mounted) showErrorSnackbar(context, message: 'Share failed: $e');
+                        if (context.mounted) {
+                          showErrorSnackbar(
+                            context,
+                            message: 'Share failed: $e',
+                          );
+                        }
                       }
                     }
                   },
@@ -124,7 +164,9 @@ class PdfCombineResultScreen extends ConsumerWidget {
                   onPressed: () => _showSaveDialog(context, ref),
                   icon: const Icon(Icons.save_alt_rounded, size: 18),
                   label: const Text(AppStrings.saveToDisk),
-                  style: OutlinedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
                 ),
                 const SizedBox(height: AppTheme.spacingSM),
                 TextButton(
@@ -133,7 +175,10 @@ class PdfCombineResultScreen extends ConsumerWidget {
                     Navigator.of(context).popUntil((route) => route.isFirst);
                     Navigator.pushNamed(context, '/pdf-combiner');
                   },
-                  child: const Text(AppStrings.mergeAnother, style: TextStyle(color: AppColors.textSecondary)),
+                  child: const Text(
+                    AppStrings.mergeAnother,
+                    style: TextStyle(color: AppColors.textSecondary),
+                  ),
                 ),
               ],
             ),

@@ -90,9 +90,7 @@ class ImageToPdfNotifier extends StateNotifier<ImageToPdfState> {
       final path = await _pickerService.pickFromCamera();
       if (path != null) _addImagePaths([path]);
     } catch (e) {
-      state = state.copyWith(
-        errorMessage: 'Failed to capture image: $e',
-      );
+      state = state.copyWith(errorMessage: 'Failed to capture image: $e');
     }
   }
 
@@ -185,5 +183,5 @@ class ImageToPdfNotifier extends StateNotifier<ImageToPdfState> {
 
 final imageToPdfProvider =
     StateNotifierProvider<ImageToPdfNotifier, ImageToPdfState>(
-  (ref) => ImageToPdfNotifier(),
-);
+      (ref) => ImageToPdfNotifier(),
+    );

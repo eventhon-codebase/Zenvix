@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// Defines a single tool available in the ToolForge hub.
+/// Defines a single tool available in the Zenvix hub.
 ///
 /// Adding a new tool to the app requires creating a [ToolDefinition]
-/// and registering it in [tool_registry.dart] — no other wiring needed.
+/// and registering it in [tool_registry.dart] â€” no other wiring needed.
 class ToolDefinition {
   /// Unique machine-readable identifier (e.g., 'image_to_pdf').
   final String id;

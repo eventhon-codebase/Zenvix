@@ -87,7 +87,7 @@ class PdfResultScreen extends ConsumerWidget {
                       try {
                         await Share.shareXFiles([
                           XFile(state.outputPath!),
-                        ], text: 'Created with ToolForge');
+                        ], text: 'Created with Zenvix');
                       } catch (e) {
                         if (context.mounted) {
                           showErrorSnackbar(

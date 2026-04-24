@@ -13,11 +13,7 @@ class ToolCard extends StatefulWidget {
   final ToolDefinition tool;
   final VoidCallback? onTap;
 
-  const ToolCard({
-    super.key,
-    required this.tool,
-    this.onTap,
-  });
+  const ToolCard({super.key, required this.tool, this.onTap});
 
   @override
   State<ToolCard> createState() => _ToolCardState();
@@ -41,11 +37,14 @@ class _ToolCardState extends State<ToolCard>
       child: AnimatedContainer(
         duration: AppTheme.animFast,
         curve: Curves.easeOut,
-        transform: Matrix4.identity()..scaleByVector3(Vector3(
-  _isPressed ? 0.96 : 1.0,
-  _isPressed ? 0.96 : 1.0,
-  _isPressed ? 0.96 : 1.0,
-)),
+        transform: Matrix4.identity()
+          ..scaleByVector3(
+            Vector3(
+              _isPressed ? 0.96 : 1.0,
+              _isPressed ? 0.96 : 1.0,
+              _isPressed ? 0.96 : 1.0,
+            ),
+          ),
         decoration: BoxDecoration(
           color: AppColors.cardSurface,
           borderRadius: BorderRadius.circular(AppTheme.radiusLarge),
@@ -92,11 +91,7 @@ class _ToolCardState extends State<ToolCard>
                         width: 1,
                       ),
                     ),
-                    child: Icon(
-                      tool.icon,
-                      color: tool.accentColor,
-                      size: 24,
-                    ),
+                    child: Icon(tool.icon, color: tool.accentColor, size: 24),
                   ),
                   const SizedBox(height: AppTheme.spacingSM + 4),
 
@@ -104,11 +99,11 @@ class _ToolCardState extends State<ToolCard>
                   Text(
                     tool.title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: tool.isAvailable
-                              ? AppColors.textPrimary
-                              : AppColors.textTertiary,
-                        ),
+                      fontWeight: FontWeight.w600,
+                      color: tool.isAvailable
+                          ? AppColors.textPrimary
+                          : AppColors.textTertiary,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -118,11 +113,11 @@ class _ToolCardState extends State<ToolCard>
                   Text(
                     tool.description,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: tool.isAvailable
-                              ? AppColors.textSecondary
-                              : AppColors.textDisabled,
-                          height: 1.4,
-                        ),
+                      color: tool.isAvailable
+                          ? AppColors.textSecondary
+                          : AppColors.textDisabled,
+                      height: 1.4,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -136,8 +131,10 @@ class _ToolCardState extends State<ToolCard>
                 top: AppTheme.spacingSM,
                 right: AppTheme.spacingSM,
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.surfaceLight,
                     borderRadius: BorderRadius.circular(AppTheme.radiusSmall),

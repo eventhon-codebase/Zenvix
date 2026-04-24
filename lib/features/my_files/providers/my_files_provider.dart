@@ -44,9 +44,15 @@ class MyFilesNotifier extends StateNotifier<MyFilesState> {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       final files = await _service.getGeneratedFiles();
-      state = state.copyWith(isLoading: false, files: _sortFiles(files, state.sortOption));
+      state = state.copyWith(
+        isLoading: false,
+        files: _sortFiles(files, state.sortOption),
+      );
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: 'Failed to load files: $e');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Failed to load files: $e',
+      );
     }
   }
 
@@ -68,10 +74,14 @@ class MyFilesNotifier extends StateNotifier<MyFilesState> {
         sorted.sort((a, b) => a.modified.compareTo(b.modified));
         break;
       case FileSortOption.nameAsc:
-        sorted.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+        sorted.sort(
+          (a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+        );
         break;
       case FileSortOption.nameDesc:
-        sorted.sort((a, b) => b.name.toLowerCase().compareTo(a.name.toLowerCase()));
+        sorted.sort(
+          (a, b) => b.name.toLowerCase().compareTo(a.name.toLowerCase()),
+        );
         break;
       case FileSortOption.sizeDesc:
         sorted.sort((a, b) => b.sizeBytes.compareTo(a.sizeBytes));

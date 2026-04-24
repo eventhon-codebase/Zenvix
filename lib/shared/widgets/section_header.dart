@@ -28,9 +28,9 @@ class SectionHeader extends StatelessWidget {
         children: [
           Text(
             title,
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  letterSpacing: 0.3,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(letterSpacing: 0.3),
           ),
           if (actionLabel != null)
             TextButton(

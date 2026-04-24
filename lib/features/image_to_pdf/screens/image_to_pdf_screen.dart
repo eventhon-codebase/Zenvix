@@ -48,7 +48,8 @@ class _ImageToPdfScreenState extends ConsumerState<ImageToPdfScreen>
 
     // Listen for errors
     ref.listen<ImageToPdfState>(imageToPdfProvider, (prev, next) {
-      if (next.errorMessage != null && next.errorMessage != prev?.errorMessage) {
+      if (next.errorMessage != null &&
+          next.errorMessage != prev?.errorMessage) {
         showErrorSnackbar(context, message: next.errorMessage!);
         ref.read(imageToPdfProvider.notifier).clearError();
       }
@@ -115,8 +116,9 @@ class _ImageToPdfScreenState extends ConsumerState<ImageToPdfScreen>
             ),
             const SizedBox(height: AppTheme.spacingSM),
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: AppTheme.spacingXL),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppTheme.spacingXL,
+              ),
               child: Text(
                 AppStrings.emptyImagesSubtitle,
                 textAlign: TextAlign.center,
@@ -134,7 +136,9 @@ class _ImageToPdfScreenState extends ConsumerState<ImageToPdfScreen>
       context: context,
       backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppTheme.radiusXL)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppTheme.radiusXL),
+        ),
       ),
       builder: (ctx) => SafeArea(
         child: Padding(
@@ -231,7 +235,11 @@ class _SourceOption extends StatelessWidget {
           color: AppColors.textPrimary,
         ),
       ),
-      trailing: Icon(Icons.chevron_right_rounded, color: AppColors.textTertiary, size: 20),
+      trailing: Icon(
+        Icons.chevron_right_rounded,
+        color: AppColors.textTertiary,
+        size: 20,
+      ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
       ),

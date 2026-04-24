@@ -19,13 +19,11 @@ void main() {
     ),
   );
 
-  runApp(const ProviderScope(child: ToolForgeApp()));
+  runApp(const ProviderScope(child: ZenvixApp()));
 }
 
-/// Root widget — wraps the app in Riverpod's [ProviderScope]
-/// and applies the OLED dark theme globally.
-class ToolForgeApp extends StatelessWidget {
-  const ToolForgeApp({super.key});
+class ZenvixApp extends StatelessWidget {
+  const ZenvixApp({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -15,7 +15,7 @@ class MyFilesService {
     for (var entity in entities) {
       if (entity is File) {
         final name = entity.path.split('/').last.split('\\').last;
-        // Check if it's a PDF. We also use the ToolForge_ prefix as a soft filter if needed, 
+        // Check if it's a PDF. We also use the Zenvix_ prefix as a soft filter if needed,
         // but any PDF in the app's sandbox is likely ours.
         if (name.toLowerCase().endsWith('.pdf')) {
           items.add(MyFileItem.fromFile(entity));
@@ -47,7 +47,7 @@ class MyFilesService {
 
     final dirPath = file.parent.path;
     final newPath = '$dirPath/$newName';
-    
+
     final newFile = await file.rename(newPath);
     return MyFileItem.fromFile(newFile);
   }

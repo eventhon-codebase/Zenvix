@@ -20,7 +20,10 @@ void showErrorSnackbar(
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 14,
+              ),
             ),
           ),
         ],
@@ -50,12 +53,19 @@ void showSuccessSnackbar(BuildContext context, {required String message}) {
     SnackBar(
       content: Row(
         children: [
-          const Icon(Icons.check_circle_outline, color: AppColors.success, size: 20),
+          const Icon(
+            Icons.check_circle_outline,
+            color: AppColors.success,
+            size: 20,
+          ),
           const SizedBox(width: AppTheme.spacingSM),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 14,
+              ),
             ),
           ),
         ],

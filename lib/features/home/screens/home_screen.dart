@@ -123,18 +123,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             child: Text(
               AppStrings.appTagline,
               style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                    height: 1.25,
-                    color: Colors.white, // Gets masked by shader
-                  ),
+                height: 1.25,
+                color: Colors.white, // Gets masked by shader
+              ),
             ),
           ),
           const SizedBox(height: AppTheme.spacingSM),
           Text(
             '${registeredTools.where((t) => t.isAvailable).length} tools ready  ·  '
             '${registeredTools.where((t) => !t.isAvailable).length} more on the way',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textTertiary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: AppColors.textTertiary),
           ),
         ],
       ),
