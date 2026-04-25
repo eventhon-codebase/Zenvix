@@ -41,5 +41,13 @@ This file tracks the progress and completed tasks for the **Zenvix** project.
 - [x] **Advanced Sorting**: Sort files by newest, oldest, name, or size.
 - [x] **Quick Access**: Added quick access to the Drawer and Home screen app bar.
 
+### 📄 PDF Page Manager Feature
+- [x] **PDF Selection**: Select single PDF file for management.
+- [x] **Preview & Thumbnails**: Render all pages as thumbnails in a grid layout.
+- [x] **Reorder Pages**: Drag and drop support to reorder pages.
+- [x] **Page Operations**: Rotate individual pages and delete specific pages.
+- [x] **Extract Pages**: Select multiple pages and extract them into a new PDF.
+- [x] **Export & Share**: Save the modified PDF with custom renaming and share support.
+
 ---
 *Last Updated: 2026-04-24*
