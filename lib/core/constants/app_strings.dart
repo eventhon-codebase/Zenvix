@@ -87,5 +87,5 @@ class AppStrings {
   // â”€â”€ About â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   static const String aboutDescription =
       'Zenvix is a premium multi-tool utility app designed for power users. '
-      'Built with â¤ï¸ using Flutter.';
+      'Built using Flutter.';
 }

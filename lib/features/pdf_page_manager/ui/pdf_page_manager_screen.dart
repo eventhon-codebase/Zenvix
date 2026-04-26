@@ -1,72 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../shared/widgets/neon_button.dart';
-import '../../../shared/widgets/error_snackbar.dart';
-import '../state/pdf_page_manager_state.dart';
-import 'pdf_page_manager_result_screen.dart';
+import 'package:zenvix/core/theme/app_colors.dart';
+import 'package:zenvix/core/theme/app_theme.dart';
+import 'package:zenvix/features/pdf_page_manager/state/pdf_page_manager_state.dart';
+import 'package:zenvix/features/pdf_page_manager/ui/pdf_page_manager_result_screen.dart';
+import 'package:zenvix/shared/widgets/error_snackbar.dart';
+import 'package:zenvix/shared/widgets/neon_button.dart';
 
 class PdfPageManagerScreen extends ConsumerWidget {
   const PdfPageManagerScreen({super.key});
 
   Future<void> _showSaveDialog(BuildContext context, WidgetRef ref) async {
     final state = ref.read(pdfPageManagerProvider);
-    final baseName = state.originalPdfName?.replaceAll('.pdf', '') ?? 'Edited_PDF';
+    final baseName =
+        state.originalPdfName?.replaceAll('.pdf', '') ?? 'Edited_PDF';
     final controller = TextEditingController(
       text: '${baseName}_${DateTime.now().millisecondsSinceEpoch}',
     );
 
     return showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: AppColors.surface,
-          title: const Text(
-            'Save PDF',
-            style: TextStyle(color: AppColors.textPrimary),
-          ),
-          content: TextField(
-            controller: controller,
-            style: const TextStyle(color: AppColors.textPrimary),
-            decoration: InputDecoration(
-              labelText: 'File Name',
-              suffixText: '.pdf',
-              labelStyle: const TextStyle(color: AppColors.textSecondary),
-              enabledBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(color: AppColors.surfaceBorder),
-              ),
-              focusedBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(color: AppColors.electricPurple),
-              ),
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: const Text(
+          'Save PDF',
+          style: TextStyle(color: AppColors.textPrimary),
+        ),
+        content: TextField(
+          controller: controller,
+          style: const TextStyle(color: AppColors.textPrimary),
+          decoration: InputDecoration(
+            labelText: 'File Name',
+            suffixText: '.pdf',
+            labelStyle: const TextStyle(color: AppColors.textSecondary),
+            enabledBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: AppColors.surfaceBorder),
             ),
-            autofocus: true,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text(
-                'Cancel',
-                style: TextStyle(color: AppColors.textSecondary),
-              ),
+            focusedBorder: const UnderlineInputBorder(
+              borderSide: BorderSide(color: AppColors.electricPurple),
             ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.electricPurple,
-              ),
-              onPressed: () async {
-                final name = controller.text.trim();
-                if (name.isEmpty) return;
-                Navigator.pop(context); // close dialog
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.electricPurple,
+            ),
+            onPressed: () async {
+              final name = controller.text.trim();
+              if (name.isEmpty) {
+                return;
+              }
+              Navigator.pop(context); // close dialog
 
-                await ref.read(pdfPageManagerProvider.notifier).savePdf(name);
-              },
-              child: const Text('Save', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        );
-      },
+              await ref.read(pdfPageManagerProvider.notifier).savePdf(name);
+            },
+            child: const Text('Save', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 
@@ -77,14 +78,17 @@ class PdfPageManagerScreen extends ConsumerWidget {
 
     // Listen for errors and success
     ref.listen<PdfPageManagerState>(pdfPageManagerProvider, (prev, next) {
-      if (next.errorMessage != null && next.errorMessage != prev?.errorMessage) {
+      if (next.errorMessage != null &&
+          next.errorMessage != prev?.errorMessage) {
         showErrorSnackbar(context, message: next.errorMessage!);
         notifier.clearError();
       }
       if (next.status == PageManagerStatus.done && next.outputPath != null) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const PdfPageManagerResultScreen()),
+          MaterialPageRoute<PdfPageManagerResultScreen>(
+            builder: (_) => const PdfPageManagerResultScreen(),
+          ),
         );
       }
     });
@@ -108,17 +112,24 @@ class PdfPageManagerScreen extends ConsumerWidget {
                     ? Icons.deselect
                     : Icons.select_all,
               ),
-              onPressed: () => notifier.toggleSelectAll(),
+              onPressed: () => notifier.toggleSelectAll,
               tooltip: 'Select All',
             ),
         ],
       ),
       body: _buildBody(context, ref, state, notifier),
-      bottomNavigationBar: state.pages.isNotEmpty ? _buildBottomBar(context, ref, state, notifier) : null,
+      bottomNavigationBar: state.pages.isNotEmpty
+          ? _buildBottomBar(context, ref, state, notifier)
+          : null,
     );
   }
 
-  Widget _buildBody(BuildContext context, WidgetRef ref, PdfPageManagerState state, PdfPageManagerNotifier notifier) {
+  Widget _buildBody(
+    BuildContext context,
+    WidgetRef ref,
+    PdfPageManagerState state,
+    PdfPageManagerNotifier notifier,
+  ) {
     if (state.status == PageManagerStatus.loading) {
       return const Center(
         child: Column(
@@ -126,7 +137,10 @@ class PdfPageManagerScreen extends ConsumerWidget {
           children: [
             CircularProgressIndicator(color: AppColors.electricPurple),
             SizedBox(height: 16),
-            Text('Loading PDF pages...', style: TextStyle(color: AppColors.textSecondary)),
+            Text(
+              'Loading PDF pages...',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
           ],
         ),
       );
@@ -173,10 +187,7 @@ class PdfPageManagerScreen extends ConsumerWidget {
               child: Text(
                 'Select a PDF to manage its pages.',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textTertiary,
-                ),
+                style: TextStyle(fontSize: 13, color: AppColors.textTertiary),
               ),
             ),
             const SizedBox(height: AppTheme.spacingLG),
@@ -214,7 +225,9 @@ class PdfPageManagerScreen extends ConsumerWidget {
               color: AppColors.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isSelected ? AppColors.electricPurple : AppColors.surfaceBorder,
+                color: isSelected
+                    ? AppColors.electricPurple
+                    : AppColors.surfaceBorder,
                 width: isSelected ? 2 : 1,
               ),
               boxShadow: [
@@ -223,7 +236,7 @@ class PdfPageManagerScreen extends ConsumerWidget {
                     color: AppColors.electricPurple.withValues(alpha: 0.3),
                     blurRadius: 8,
                     spreadRadius: 1,
-                  )
+                  ),
               ],
             ),
             child: Stack(
@@ -244,7 +257,10 @@ class PdfPageManagerScreen extends ConsumerWidget {
                   top: 8,
                   left: 8,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.black.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(12),
@@ -265,7 +281,11 @@ class PdfPageManagerScreen extends ConsumerWidget {
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.rotate_right_rounded, color: Colors.white, size: 20),
+                        icon: const Icon(
+                          Icons.rotate_right_rounded,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                         onPressed: () => notifier.rotatePage(page.id),
                         style: IconButton.styleFrom(
                           backgroundColor: Colors.black.withValues(alpha: 0.5),
@@ -273,7 +293,11 @@ class PdfPageManagerScreen extends ConsumerWidget {
                       ),
                       const SizedBox(width: 4),
                       IconButton(
-                        icon: const Icon(Icons.delete_outline, color: AppColors.error, size: 20),
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: AppColors.error,
+                          size: 20,
+                        ),
                         onPressed: () => notifier.deletePage(page.id),
                         style: IconButton.styleFrom(
                           backgroundColor: Colors.black.withValues(alpha: 0.5),
@@ -292,7 +316,11 @@ class PdfPageManagerScreen extends ConsumerWidget {
                         shape: BoxShape.circle,
                       ),
                       padding: const EdgeInsets.all(4),
-                      child: const Icon(Icons.check, color: Colors.white, size: 16),
+                      child: const Icon(
+                        Icons.check,
+                        color: Colors.white,
+                        size: 16,
+                      ),
                     ),
                   ),
               ],
@@ -303,7 +331,12 @@ class PdfPageManagerScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildBottomBar(BuildContext context, WidgetRef ref, PdfPageManagerState state, PdfPageManagerNotifier notifier) {
+  Widget _buildBottomBar(
+    BuildContext context,
+    WidgetRef ref,
+    PdfPageManagerState state,
+    PdfPageManagerNotifier notifier,
+  ) {
     final hasSelection = state.selectedPageIds.isNotEmpty;
 
     return Container(
@@ -322,19 +355,31 @@ class PdfPageManagerScreen extends ConsumerWidget {
           children: [
             if (hasSelection)
               Padding(
-                padding: const EdgeInsets.only(bottom: 12.0),
+                padding: const EdgeInsets.only(bottom: 12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     TextButton.icon(
                       onPressed: () => notifier.rotateSelectedPages(),
-                      icon: const Icon(Icons.rotate_right_rounded, color: AppColors.textPrimary),
-                      label: const Text('Rotate', style: TextStyle(color: AppColors.textPrimary)),
+                      icon: const Icon(
+                        Icons.rotate_right_rounded,
+                        color: AppColors.textPrimary,
+                      ),
+                      label: const Text(
+                        'Rotate',
+                        style: TextStyle(color: AppColors.textPrimary),
+                      ),
                     ),
                     TextButton.icon(
                       onPressed: () => notifier.deleteSelectedPages(),
-                      icon: const Icon(Icons.delete_outline, color: AppColors.error),
-                      label: const Text('Delete', style: TextStyle(color: AppColors.error)),
+                      icon: const Icon(
+                        Icons.delete_outline,
+                        color: AppColors.error,
+                      ),
+                      label: const Text(
+                        'Delete',
+                        style: TextStyle(color: AppColors.error),
+                      ),
                     ),
                   ],
                 ),
@@ -347,7 +392,9 @@ class PdfPageManagerScreen extends ConsumerWidget {
                     label: hasSelection ? 'Extract Selected' : 'Save PDF',
                     icon: Icons.save_alt_rounded,
                     isLoading: state.status == PageManagerStatus.processing,
-                    onPressed: state.pages.isEmpty ? null : () => _showSaveDialog(context, ref),
+                    onPressed: state.pages.isEmpty
+                        ? null
+                        : () => _showSaveDialog(context, ref),
                   ),
                 ),
               ],

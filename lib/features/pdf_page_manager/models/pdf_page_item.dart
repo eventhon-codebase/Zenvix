@@ -1,12 +1,6 @@
 import 'dart:typed_data';
 
 class PdfPageItem {
-  final String id;
-  final int originalIndex; // The 0-based index in the original PDF
-  final Uint8List thumbnailData;
-  final int rotationAngle; // 0, 90, 180, 270
-  final bool isSelected;
-
   const PdfPageItem({
     required this.id,
     required this.originalIndex,
@@ -14,6 +8,11 @@ class PdfPageItem {
     this.rotationAngle = 0,
     this.isSelected = false,
   });
+  final String id;
+  final int originalIndex; // The 0-based index in the original PDF
+  final Uint8List thumbnailData;
+  final int rotationAngle; // 0, 90, 180, 270
+  final bool isSelected;
 
   PdfPageItem copyWith({
     String? id,
@@ -21,13 +20,11 @@ class PdfPageItem {
     Uint8List? thumbnailData,
     int? rotationAngle,
     bool? isSelected,
-  }) {
-    return PdfPageItem(
-      id: id ?? this.id,
-      originalIndex: originalIndex ?? this.originalIndex,
-      thumbnailData: thumbnailData ?? this.thumbnailData,
-      rotationAngle: rotationAngle ?? this.rotationAngle,
-      isSelected: isSelected ?? this.isSelected,
-    );
-  }
+  }) => PdfPageItem(
+    id: id ?? this.id,
+    originalIndex: originalIndex ?? this.originalIndex,
+    thumbnailData: thumbnailData ?? this.thumbnailData,
+    rotationAngle: rotationAngle ?? this.rotationAngle,
+    isSelected: isSelected ?? this.isSelected,
+  );
 }

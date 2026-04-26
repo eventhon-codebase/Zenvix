@@ -2,20 +2,13 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/pdf_page_item.dart';
-import '../services/pdf_page_manager_service.dart';
+import 'package:zenvix/features/pdf_page_manager/models/pdf_page_item.dart';
+import 'package:zenvix/features/pdf_page_manager/services/pdf_page_manager_service.dart';
 
 enum PageManagerStatus { idle, loading, processing, done, error }
 
 class PdfPageManagerState {
-  final String? originalPdfPath;
-  final String? originalPdfName;
-  final Uint8List? originalPdfData;
-  final List<PdfPageItem> pages;
-  final PageManagerStatus status;
-  final String? outputPath;
-  final String? errorMessage;
-  final Set<String> selectedPageIds; // For multi-select actions
+  // For multi-select actions
 
   const PdfPageManagerState({
     this.originalPdfPath,
@@ -27,6 +20,14 @@ class PdfPageManagerState {
     this.errorMessage,
     this.selectedPageIds = const {},
   });
+  final String? originalPdfPath;
+  final String? originalPdfName;
+  final Uint8List? originalPdfData;
+  final List<PdfPageItem> pages;
+  final PageManagerStatus status;
+  final String? outputPath;
+  final String? errorMessage;
+  final Set<String> selectedPageIds;
 
   PdfPageManagerState copyWith({
     String? originalPdfPath,
@@ -39,24 +40,21 @@ class PdfPageManagerState {
     Set<String>? selectedPageIds,
     bool clearOutput = false,
     bool clearError = false,
-  }) {
-    return PdfPageManagerState(
-      originalPdfPath: originalPdfPath ?? this.originalPdfPath,
-      originalPdfName: originalPdfName ?? this.originalPdfName,
-      originalPdfData: originalPdfData ?? this.originalPdfData,
-      pages: pages ?? this.pages,
-      status: status ?? this.status,
-      outputPath: clearOutput ? null : (outputPath ?? this.outputPath),
-      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
-      selectedPageIds: selectedPageIds ?? this.selectedPageIds,
-    );
-  }
+  }) => PdfPageManagerState(
+    originalPdfPath: originalPdfPath ?? this.originalPdfPath,
+    originalPdfName: originalPdfName ?? this.originalPdfName,
+    originalPdfData: originalPdfData ?? this.originalPdfData,
+    pages: pages ?? this.pages,
+    status: status ?? this.status,
+    outputPath: clearOutput ? null : (outputPath ?? this.outputPath),
+    errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
+    selectedPageIds: selectedPageIds ?? this.selectedPageIds,
+  );
 }
 
 class PdfPageManagerNotifier extends StateNotifier<PdfPageManagerState> {
-  final PdfPageManagerService _service = PdfPageManagerService();
-
   PdfPageManagerNotifier() : super(const PdfPageManagerState());
+  final PdfPageManagerService _service = PdfPageManagerService();
 
   /// Pick a PDF file to manage
   Future<void> pickPdf() async {
@@ -64,12 +62,15 @@ class PdfPageManagerNotifier extends StateNotifier<PdfPageManagerState> {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf'],
-        allowMultiple: false,
       );
-      if (result == null || result.files.isEmpty) return;
+      if (result == null || result.files.isEmpty) {
+        return;
+      }
 
       final file = result.files.first;
-      if (file.path == null) return;
+      if (file.path == null) {
+        return;
+      }
 
       state = state.copyWith(
         status: PageManagerStatus.loading,
@@ -80,7 +81,7 @@ class PdfPageManagerNotifier extends StateNotifier<PdfPageManagerState> {
       );
 
       final fileData = await File(file.path!).readAsBytes();
-      
+
       final pages = await _service.getPdfPages(fileData);
 
       state = state.copyWith(
@@ -89,7 +90,7 @@ class PdfPageManagerNotifier extends StateNotifier<PdfPageManagerState> {
         pages: pages,
         selectedPageIds: {}, // reset selection
       );
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         status: PageManagerStatus.error,
         errorMessage: 'Failed to load PDF: $e',
@@ -99,9 +100,9 @@ class PdfPageManagerNotifier extends StateNotifier<PdfPageManagerState> {
 
   void reorderPages(int oldIndex, int newIndex) {
     final pages = List<PdfPageItem>.from(state.pages);
-    if (newIndex > oldIndex) newIndex--;
+    final targetIndex = newIndex > oldIndex ? newIndex - 1 : newIndex;
     final item = pages.removeAt(oldIndex);
-    pages.insert(newIndex, item);
+    pages.insert(targetIndex, item);
     state = state.copyWith(pages: pages);
   }
 
@@ -132,7 +133,9 @@ class PdfPageManagerNotifier extends StateNotifier<PdfPageManagerState> {
   }
 
   void deleteSelectedPages() {
-    final pages = state.pages.where((p) => !state.selectedPageIds.contains(p.id)).toList();
+    final pages = state.pages
+        .where((p) => !state.selectedPageIds.contains(p.id))
+        .toList();
     state = state.copyWith(pages: pages, selectedPageIds: {});
   }
 
@@ -168,7 +171,9 @@ class PdfPageManagerNotifier extends StateNotifier<PdfPageManagerState> {
 
     // If there are selected pages, extract only those. Otherwise save all pages in current order.
     final pagesToSave = state.selectedPageIds.isNotEmpty
-        ? state.pages.where((p) => state.selectedPageIds.contains(p.id)).toList()
+        ? state.pages
+              .where((p) => state.selectedPageIds.contains(p.id))
+              .toList()
         : state.pages;
 
     state = state.copyWith(
@@ -188,7 +193,7 @@ class PdfPageManagerNotifier extends StateNotifier<PdfPageManagerState> {
         status: PageManagerStatus.done,
         outputPath: outputPath,
       );
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         status: PageManagerStatus.error,
         errorMessage: 'Failed to export PDF: $e',

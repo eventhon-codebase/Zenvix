@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../models/tool_definition.dart';
-import '../theme/app_colors.dart';
+import 'package:zenvix/core/models/tool_definition.dart';
+import 'package:zenvix/core/theme/app_colors.dart';
 
 /// Central registry of all tools in the app.
 ///
 /// To add a new tool:
 ///   1. Create its feature folder under `lib/features/`.
 ///   2. Add a [ToolDefinition] entry below.
-///   3. Add its route in [app_router.dart].
+///   3. Add its route in `app_router.dart`.
 /// That's it — the home grid and drawer auto-populate from this list.
 final List<ToolDefinition> registeredTools = [
   // ── Available Tools ───────────────────────────────────────────────────

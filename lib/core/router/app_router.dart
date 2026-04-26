@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-
-import '../../features/home/screens/home_screen.dart';
-import '../../features/image_to_pdf/screens/image_to_pdf_screen.dart';
-import '../../features/pdf_combiner/screens/pdf_combiner_screen.dart';
-import '../../features/pdf_page_manager/ui/pdf_page_manager_screen.dart';
-import '../../features/my_files/screens/my_files_screen.dart';
+import 'package:zenvix/features/home/screens/home_screen.dart';
+import 'package:zenvix/features/image_to_pdf/screens/image_to_pdf_screen.dart';
+import 'package:zenvix/features/my_files/screens/my_files_screen.dart';
+import 'package:zenvix/features/pdf_combiner/screens/pdf_combiner_screen.dart';
+import 'package:zenvix/features/pdf_page_manager/ui/pdf_page_manager_screen.dart';
 
 /// Generates routes from named paths.
 ///
-/// Each tool registered in [tool_registry.dart] should have a matching
-/// case here.  Using [onGenerateRoute] keeps navigation decoupled from
+/// Each tool registered in `tool_registry.dart` should have a matching
+/// case here.  Using `onGenerateRoute` keeps navigation decoupled from
 /// the UI layer.
+// ignore_for_file: avoid_classes_with_only_static_members
+
 class AppRouter {
+  AppRouter._();
   static Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/':
@@ -33,25 +35,23 @@ class AppRouter {
   static PageRouteBuilder<dynamic> _buildRoute(
     Widget page,
     RouteSettings settings,
-  ) {
-    return PageRouteBuilder(
-      settings: settings,
-      pageBuilder: (context, animation, secondaryAnimation) => page,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        final curvedAnimation = CurvedAnimation(
-          parent: animation,
-          curve: Curves.easeOutCubic,
-        );
+  ) => PageRouteBuilder(
+    settings: settings,
+    pageBuilder: (context, animation, secondaryAnimation) => page,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final curvedAnimation = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
+      );
 
-        return SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(1.0, 0.0),
-            end: Offset.zero,
-          ).animate(curvedAnimation),
-          child: FadeTransition(opacity: curvedAnimation, child: child),
-        );
-      },
-      transitionDuration: const Duration(milliseconds: 350),
-    );
-  }
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(1, 0),
+          end: Offset.zero,
+        ).animate(curvedAnimation),
+        child: FadeTransition(opacity: curvedAnimation, child: child),
+      );
+    },
+    transitionDuration: const Duration(milliseconds: 350),
+  );
 }

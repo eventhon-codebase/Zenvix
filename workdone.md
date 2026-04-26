@@ -26,7 +26,8 @@ This file tracks the progress and completed tasks for the **Zenvix** project.
 - [x] **Result Screen**: Preview and sharing of the generated PDF.
 
 ### ðŸ“„ PDF Combiner Feature
-- [x] Basic folder structure and routing setup.
+- [x] Basic folder struc
+ture and routing setup.
 - [x] Screen and service skeletons implemented.
 - [x] **File Selection**: Pick multiple PDFs and reorder them.
 - [x] **Merge Logic**: Combine PDFs while maintaining order.

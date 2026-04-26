@@ -4,54 +4,53 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:printing/printing.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
-import '../models/pdf_page_item.dart';
+import 'package:zenvix/features/pdf_page_manager/models/pdf_page_item.dart';
 
 class PdfPageManagerService {
-  /// Rasterizes PDF pages into thumbnails using printing package.
   Future<List<PdfPageItem>> getPdfPages(Uint8List pdfData) async {
-    final List<PdfPageItem> pages = [];
-    int index = 0;
+    final pages = <PdfPageItem>[];
+    var index = 0;
 
-    await for (final page in Printing.raster(pdfData, dpi: 72)) {
+    await for (final page in Printing.raster(pdfData)) {
       final pngBytes = await page.toPng();
-      pages.add(PdfPageItem(
-        id: '${DateTime.now().microsecondsSinceEpoch}_$index',
-        originalIndex: index,
-        thumbnailData: pngBytes,
-      ));
+      pages.add(
+        PdfPageItem(
+          id: '${DateTime.now().microsecondsSinceEpoch}_$index',
+          originalIndex: index,
+          thumbnailData: pngBytes,
+        ),
+      );
       index++;
     }
 
     return pages;
   }
 
-  /// Exports the selected pages into a new PDF document.
   Future<String> exportPdf({
     required Uint8List originalPdfData,
     required List<PdfPageItem> finalPages,
     required String desiredName,
   }) async {
-    final PdfDocument originalDoc = PdfDocument(inputBytes: originalPdfData);
-    final PdfDocument newDoc = PdfDocument();
+    final originalDoc = PdfDocument(inputBytes: originalPdfData);
+    final newDoc = PdfDocument();
 
     for (var pageItem in finalPages) {
       final oldPage = originalDoc.pages[pageItem.originalIndex];
       final newPage = newDoc.pages.add();
 
-      // Apply rotation to new page based on user edits + original rotation
-      // Syncfusion uses enum PdfPageRotateAngle
-      final int totalAngle = (pageItem.rotationAngle + _getAngleValue(oldPage.rotation)) % 360;
+      final totalAngle =
+          (pageItem.rotationAngle + _getAngleValue(oldPage.rotation)) % 360;
       newPage.rotation = _getRotateAngle(totalAngle);
 
       final template = oldPage.createTemplate();
-      newPage.graphics.drawPdfTemplate(template, const Offset(0, 0));
+      newPage.graphics.drawPdfTemplate(template, Offset(0, 0));
     }
 
-    final List<int> bytes = newDoc.saveSync();
+    final bytes = newDoc.saveSync();
     originalDoc.dispose();
     newDoc.dispose();
 
-    return await _saveToDevice(Uint8List.fromList(bytes), desiredName);
+    return _saveToDevice(Uint8List.fromList(bytes), desiredName);
   }
 
   int _getAngleValue(PdfPageRotateAngle angle) {
@@ -63,7 +62,7 @@ class PdfPageManagerService {
       case PdfPageRotateAngle.rotateAngle270:
         return 270;
       case PdfPageRotateAngle.rotateAngle0:
-      return 0;
+        return 0;
     }
   }
 
@@ -81,16 +80,16 @@ class PdfPageManagerService {
     }
   }
 
-  /// Saves the merged PDF to a public directory (Downloads on Android, Documents on iOS).
   Future<String> _saveToDevice(Uint8List data, String desiredName) async {
-    if (!desiredName.toLowerCase().endsWith('.pdf')) {
-      desiredName += '.pdf';
+    var finalName = desiredName;
+    if (!finalName.toLowerCase().endsWith('.pdf')) {
+      finalName += '.pdf';
     }
 
     Directory? directory;
     if (Platform.isAndroid) {
       directory = Directory('/storage/emulated/0/Download');
-      if (!await directory.exists()) {
+      if (!directory.existsSync()) {
         directory = await getExternalStorageDirectory();
       }
     } else {
@@ -101,7 +100,7 @@ class PdfPageManagerService {
       throw Exception('Could not find directory to save the file.');
     }
 
-    final targetPath = '${directory.path}/$desiredName';
+    final targetPath = '${directory.path}/$finalName';
     final file = File(targetPath);
     await file.writeAsBytes(data);
     return file.path;
