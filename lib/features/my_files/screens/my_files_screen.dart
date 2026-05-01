@@ -5,7 +5,7 @@ import 'package:zenvix/core/constants/app_strings.dart';
 import 'package:zenvix/core/theme/app_colors.dart';
 import 'package:zenvix/core/theme/app_theme.dart';
 import 'package:zenvix/features/my_files/models/my_file_item.dart';
-import 'package:zenvix/features/my_files/providers/my_files_provider.dart';
+import 'package:zenvix/features/my_files/providers/file_repository.dart';
 import 'package:zenvix/features/my_files/screens/pdf_viewer_screen.dart';
 import 'package:zenvix/shared/widgets/error_snackbar.dart';
 
@@ -17,19 +17,28 @@ class MyFilesScreen extends ConsumerStatefulWidget {
 }
 
 class _MyFilesScreenState extends ConsumerState<MyFilesScreen> {
+  final TextEditingController _searchController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
-    // Refresh files when the screen opens
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(myFilesProvider.notifier).loadFiles();
+      ref.read(fileRepositoryProvider.notifier).loadFiles();
     });
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   void _showRenameDialog(MyFileItem file) {
-    final controller = TextEditingController(
-      text: file.name.replaceAll('.pdf', ''),
-    );
+    final baseName = file.name.contains('.') 
+      ? file.name.substring(0, file.name.lastIndexOf('.'))
+      : file.name;
+    
+    final controller = TextEditingController(text: baseName);
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -41,14 +50,14 @@ class _MyFilesScreenState extends ConsumerState<MyFilesScreen> {
         content: TextField(
           controller: controller,
           style: const TextStyle(color: AppColors.textPrimary),
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'New Name',
-            suffixText: '.pdf',
-            labelStyle: TextStyle(color: AppColors.textSecondary),
-            enabledBorder: UnderlineInputBorder(
+            suffixText: file.extension.isNotEmpty ? '.${file.extension}' : '',
+            labelStyle: const TextStyle(color: AppColors.textSecondary),
+            enabledBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: AppColors.surfaceBorder),
             ),
-            focusedBorder: UnderlineInputBorder(
+            focusedBorder: const UnderlineInputBorder(
               borderSide: BorderSide(color: AppColors.electricPurple),
             ),
           ),
@@ -68,10 +77,9 @@ class _MyFilesScreenState extends ConsumerState<MyFilesScreen> {
             ),
             onPressed: () async {
               final newName = controller.text.trim();
-              if (newName.isNotEmpty &&
-                  newName != file.name.replaceAll('.pdf', '')) {
+              if (newName.isNotEmpty && newName != baseName) {
                 await ref
-                    .read(myFilesProvider.notifier)
+                    .read(fileRepositoryProvider.notifier)
                     .renameFile(file.path, newName);
               }
               if (context.mounted) {
@@ -109,7 +117,7 @@ class _MyFilesScreenState extends ConsumerState<MyFilesScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
             onPressed: () async {
-              await ref.read(myFilesProvider.notifier).deleteFile(file.path);
+              await ref.read(fileRepositoryProvider.notifier).deleteFile(file.path);
               if (context.mounted) {
                 Navigator.pop(context);
               }
@@ -123,9 +131,7 @@ class _MyFilesScreenState extends ConsumerState<MyFilesScreen> {
 
   Future<void> _shareFile(MyFileItem file) async {
     try {
-      await Share.shareXFiles([
-        XFile(file.path),
-      ], text: 'Generated with Zenvix');
+      await Share.shareXFiles([XFile(file.path)], text: 'Generated with Zenvix');
     } on Exception catch (e) {
       if (mounted) {
         showErrorSnackbar(context, message: 'Failed to share: $e');
@@ -134,27 +140,58 @@ class _MyFilesScreenState extends ConsumerState<MyFilesScreen> {
   }
 
   void _openFile(MyFileItem file) {
-    Navigator.push(
-      context,
-      MaterialPageRoute<PdfViewerScreen>(
-        builder: (_) =>
-            PdfViewerScreen(filePath: file.path, fileName: file.name),
-      ),
-    );
+    if (file.extension == 'pdf') {
+      Navigator.push(
+        context,
+        MaterialPageRoute<PdfViewerScreen>(
+          builder: (_) => PdfViewerScreen(filePath: file.path, fileName: file.name),
+        ),
+      );
+    } else {
+      // Basic fallback: just share it or show a snackbar if not pdf
+      // Ideally we'd have image/text viewers, but for now share it
+      _shareFile(file);
+    }
+  }
+
+  IconData _getIconForExtension(String ext) {
+    if (ext == 'pdf') {
+      return Icons.picture_as_pdf_rounded;
+    }
+    if (['png', 'jpg', 'jpeg'].contains(ext)) {
+      return Icons.image_rounded;
+    }
+    if (['txt', 'csv', 'json', 'md'].contains(ext)) {
+      return Icons.description_rounded;
+    }
+    return Icons.insert_drive_file_rounded;
+  }
+
+  Color _getColorForExtension(String ext) {
+    if (ext == 'pdf') {
+      return AppColors.electricPurple;
+    }
+    if (['png', 'jpg', 'jpeg'].contains(ext)) {
+      return AppColors.success;
+    }
+    if (['txt', 'csv', 'json', 'md'].contains(ext)) {
+      return AppColors.neonBlue;
+    }
+    return AppColors.textSecondary;
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(myFilesProvider);
+    final state = ref.watch(fileRepositoryProvider);
 
-    // Listen for errors
-    ref.listen<MyFilesState>(myFilesProvider, (prev, next) {
-      if (next.errorMessage != null &&
-          next.errorMessage != prev?.errorMessage) {
+    ref.listen<FileRepositoryState>(fileRepositoryProvider, (prev, next) {
+      if (next.errorMessage != null && next.errorMessage != prev?.errorMessage) {
         showErrorSnackbar(context, message: next.errorMessage!);
-        ref.read(myFilesProvider.notifier).clearError();
+        ref.read(fileRepositoryProvider.notifier).clearError();
       }
     });
+
+    final displayFiles = state.displayFiles;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -165,43 +202,82 @@ class _MyFilesScreenState extends ConsumerState<MyFilesScreen> {
             icon: const Icon(Icons.sort_rounded),
             tooltip: 'Sort by',
             onSelected: (option) =>
-                ref.read(myFilesProvider.notifier).setSortOption(option),
+                ref.read(fileRepositoryProvider.notifier).setSortOption(option),
             itemBuilder: (context) => [
-              _buildSortItem(
-                FileSortOption.newest,
-                'Newest First',
-                state.sortOption,
-              ),
-              _buildSortItem(
-                FileSortOption.oldest,
-                'Oldest First',
-                state.sortOption,
-              ),
-              _buildSortItem(
-                FileSortOption.nameAsc,
-                'Name (A-Z)',
-                state.sortOption,
-              ),
-              _buildSortItem(
-                FileSortOption.nameDesc,
-                'Name (Z-A)',
-                state.sortOption,
-              ),
-              _buildSortItem(
-                FileSortOption.sizeDesc,
-                'Largest First',
-                state.sortOption,
-              ),
-              _buildSortItem(
-                FileSortOption.sizeAsc,
-                'Smallest First',
-                state.sortOption,
-              ),
+              _buildSortItem(FileSortOption.newest, 'Newest First', state.sortOption),
+              _buildSortItem(FileSortOption.oldest, 'Oldest First', state.sortOption),
+              _buildSortItem(FileSortOption.nameAsc, 'Name (A-Z)', state.sortOption),
+              _buildSortItem(FileSortOption.nameDesc, 'Name (Z-A)', state.sortOption),
+              _buildSortItem(FileSortOption.sizeDesc, 'Largest First', state.sortOption),
+              _buildSortItem(FileSortOption.sizeAsc, 'Smallest First', state.sortOption),
             ],
           ),
         ],
       ),
-      body: _buildBody(state),
+      body: Column(
+        children: [
+          // Search and Filters
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingMD, vertical: AppTheme.spacingSM),
+            child: Column(
+              children: [
+                TextField(
+                  controller: _searchController,
+                  onChanged: (val) => ref.read(fileRepositoryProvider.notifier).setSearchQuery(val),
+                  style: const TextStyle(color: AppColors.textPrimary),
+                  decoration: InputDecoration(
+                    hintText: 'Search documents...',
+                    hintStyle: const TextStyle(color: AppColors.textSecondary),
+                    prefixIcon: const Icon(Icons.search_rounded, color: AppColors.textSecondary),
+                    filled: true,
+                    fillColor: AppColors.cardSurface,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(AppTheme.radiusMedium),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+                const SizedBox(height: AppTheme.spacingSM),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildFilterChip('All', 'all', state.filterType),
+                      const SizedBox(width: AppTheme.spacingSM),
+                      _buildFilterChip('PDFs', 'pdf', state.filterType),
+                      const SizedBox(width: AppTheme.spacingSM),
+                      _buildFilterChip('Images', 'image', state.filterType),
+                      const SizedBox(width: AppTheme.spacingSM),
+                      _buildFilterChip('Documents', 'text', state.filterType),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          
+          Expanded(child: _buildBody(state, displayFiles)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(String label, String value, String current) {
+    final isSelected = current == value;
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (_) => ref.read(fileRepositoryProvider.notifier).setFilterType(value),
+      backgroundColor: AppColors.cardSurface,
+      selectedColor: AppColors.neonBlue.withValues(alpha: 0.2),
+      labelStyle: TextStyle(
+        color: isSelected ? AppColors.neonBlue : AppColors.textSecondary,
+        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+      ),
+      side: BorderSide(
+        color: isSelected ? AppColors.neonBlue : AppColors.surfaceBorder,
+      ),
     );
   }
 
@@ -221,14 +297,14 @@ class _MyFilesScreenState extends ConsumerState<MyFilesScreen> {
     ),
   );
 
-  Widget _buildBody(MyFilesState state) {
-    if (state.isLoading && state.files.isEmpty) {
+  Widget _buildBody(FileRepositoryState state, List<MyFileItem> displayFiles) {
+    if (state.isLoading && state.allFiles.isEmpty) {
       return const Center(
         child: CircularProgressIndicator(color: AppColors.electricPurple),
       );
     }
 
-    if (state.files.isEmpty) {
+    if (state.allFiles.isEmpty || displayFiles.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -255,21 +331,21 @@ class _MyFilesScreenState extends ConsumerState<MyFilesScreen> {
               ),
             ),
             const SizedBox(height: AppTheme.spacingLG),
-            const Text(
-              AppStrings.emptyFilesTitle,
-              style: TextStyle(
+            Text(
+              state.allFiles.isEmpty ? AppStrings.emptyFilesTitle : 'No matching files',
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
                 color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: AppTheme.spacingSM),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppTheme.spacingXL),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingXL),
               child: Text(
-                AppStrings.emptyFilesSubtitle,
+                state.allFiles.isEmpty ? AppStrings.emptyFilesSubtitle : 'Try adjusting your search or filters.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: AppColors.textTertiary),
+                style: const TextStyle(fontSize: 13, color: AppColors.textTertiary),
               ),
             ),
           ],
@@ -278,19 +354,21 @@ class _MyFilesScreenState extends ConsumerState<MyFilesScreen> {
     }
 
     return RefreshIndicator(
-      onRefresh: () => ref.read(myFilesProvider.notifier).loadFiles(),
+      onRefresh: () => ref.read(fileRepositoryProvider.notifier).loadFiles(),
       color: AppColors.neonBlue,
       backgroundColor: AppColors.surface,
       child: ListView.builder(
         padding: const EdgeInsets.all(AppTheme.spacingMD),
-        itemCount: state.files.length,
+        itemCount: displayFiles.length,
         itemBuilder: (context, index) {
-          final file = state.files[index];
-          // Time formatting
+          final file = displayFiles[index];
           final diff = DateTime.now().difference(file.modified);
           final timeStr = diff.inDays > 0
               ? '${diff.inDays}d ago'
               : (diff.inHours > 0 ? '${diff.inHours}h ago' : 'Just now');
+
+          final iconData = _getIconForExtension(file.extension);
+          final iconColor = _getColorForExtension(file.extension);
 
           return Card(
             margin: const EdgeInsets.only(bottom: AppTheme.spacingSM),
@@ -312,12 +390,12 @@ class _MyFilesScreenState extends ConsumerState<MyFilesScreen> {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: AppColors.electricPurple.withValues(alpha: 0.12),
+                        color: iconColor.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(
-                        Icons.picture_as_pdf_rounded,
-                        color: AppColors.electricPurple,
+                      child: Icon(
+                        iconData,
+                        color: iconColor,
                         size: 24,
                       ),
                     ),
@@ -337,7 +415,7 @@ class _MyFilesScreenState extends ConsumerState<MyFilesScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${file.formattedSize}  Â·  $timeStr',
+                            '${file.formattedSize} · $timeStr',
                             style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.textSecondary,
@@ -364,14 +442,8 @@ class _MyFilesScreenState extends ConsumerState<MyFilesScreen> {
                       },
                       itemBuilder: (context) => [
                         const PopupMenuItem(value: 'open', child: Text('Open')),
-                        const PopupMenuItem(
-                          value: 'share',
-                          child: Text('Share'),
-                        ),
-                        const PopupMenuItem(
-                          value: 'rename',
-                          child: Text('Rename'),
-                        ),
+                        const PopupMenuItem(value: 'share', child: Text('Share')),
+                        const PopupMenuItem(value: 'rename', child: Text('Rename')),
                         const PopupMenuDivider(),
                         const PopupMenuItem(
                           value: 'delete',
